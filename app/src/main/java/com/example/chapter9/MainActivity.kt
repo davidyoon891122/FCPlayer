@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.playButton.setOnClickListener {
+            Log.d("main", "didTapPlayButton")
             mediaPlayerPlay()
         }
 

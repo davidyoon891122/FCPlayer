@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,8 +18,9 @@
         <service
             android:name=".MediaPlayerService"
             android:enabled="true"
-            android:exported="false"></service>
-
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true">
