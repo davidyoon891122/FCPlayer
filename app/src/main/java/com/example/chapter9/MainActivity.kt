@@ -38,20 +38,26 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MediaPlayerService::class.java)
             .apply { action = MEDIA_PLAYER_PLAY }
 
-        startService(intent)
+        startForegroundService(intent)
     }
 
     private fun mediaPlayerPause() {
         val intent = Intent(this, MediaPlayerService::class.java)
             .apply { action = MEDIA_PLAYER_PAUSE }
 
-        startService(intent)
+        startForegroundService(intent)
+
     }
 
     private fun mediaPlayerStop() {
         val intent = Intent(this, MediaPlayerService::class.java)
             .apply { action = MEDIA_PLAYER_STOP }
 
-        startService(intent)
+        startForegroundService(intent)
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this, MediaPlayerService::class.java))
+        super.onDestroy()
     }
 }

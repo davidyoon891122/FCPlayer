@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
 import android.graphics.drawable.Icon
 import android.media.MediaPlayer
@@ -15,6 +16,7 @@ import android.util.Log
 class MediaPlayerService : Service() {
 
     private var mediaPlayer: MediaPlayer? = null
+    private val receiver = LowBatteryReceiver()
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -24,6 +26,7 @@ class MediaPlayerService : Service() {
         super.onCreate()
         Log.d("service", "onCreate")
         createNotificationChannel()
+        initializeReceiver()
 
         val playIcon = Icon.createWithResource(baseContext, R.drawable.baseline_play_arrow_24)
         val pauseIcon = Icon.createWithResource(baseContext, R.drawable.baseline_pause_24)
@@ -99,9 +102,16 @@ class MediaPlayerService : Service() {
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(CHANNEL_ID, "MEDIA_PLAYER", NotificationManager.IMPORTANCE_DEFAULT)
-        val notificationManager = baseContext.getSystemService(NotificationManager::class.java)
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
 
+    }
+
+    private fun initializeReceiver() {
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_BATTERY_LOW)
+        }
+        registerReceiver(receiver, filter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -124,6 +134,16 @@ class MediaPlayerService : Service() {
         }
 
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onDestroy() {
+        mediaPlayer?.apply {
+            stop()
+            release()
+        }
+        mediaPlayer = null
+        unregisterReceiver(receiver)
+        super.onDestroy()
     }
 
 }
